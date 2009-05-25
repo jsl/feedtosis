@@ -1,0 +1,19 @@
+HTTP/1.1 302 Found
+Date: Mon, 25 May 2009 17:36:02 GMT
+Server: Apache/2.0.52 (Red Hat)
+Location: http://feeds.feedburner.com/wooster
+Content-Length: 311
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+
+HTTP/1.1 200 OK
+Last-Modified: Mon, 25 May 2009 16:38:49 GMT
+ETag: /YJUYmsYIcQeFAGy7OZQoaCQeXw
+Content-Type: text/xml; charset=utf-8
+Date: Mon, 25 May 2009 17:36:03 GMT
+Expires: Mon, 25 May 2009 17:36:03 GMT
+Cache-Control: private, max-age=0
+X-Content-Type-Options: nosniff
+Server: GFE/2.0
+Transfer-Encoding: chunked
+
