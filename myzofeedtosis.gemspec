@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{myzofeedtosis}
-  s.version = "0.0.1.1"
+  s.version = "0.0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Justin Leitgeb"]
@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
     "lib/extensions/feed_normalizer/feed_instance_methods.rb", "lib/myzofeedtosis/client.rb", "lib/myzofeedtosis.rb", 
     "LICENSE", "myzofeedtosis.gemspec", "Rakefile", "README.rdoc", "spec/extensions/feed_normalizer/feed_instance_methods_spec.rb", 
     "spec/fixtures/http_headers/wooster.txt", "spec/fixtures/xml/older_wooster.xml", "spec/fixtures/xml/wooster.xml", 
-    "spec/myzofeedtosis/client_spec.rb", "spec/myzofeedtosis_spec.rb", "spec/spec_helper.rb", "VERSION.yml"]
+    "spec/myzofeedtosis/client_spec.rb", "spec/myzofeedtosis_spec.rb", "spec/spec_helper.rb"]
   
   s.has_rdoc = true
   s.homepage = %q{http://github.com/jsl/myzofeedtosis}
