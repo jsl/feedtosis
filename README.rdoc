@@ -48,12 +48,12 @@ all of the FeedNormalizer::Feed objects respond not only to +entries+, but +new_
 that haven't been seen before.
 
 Myzofeedtosis is designed for these situations where you have one or maybe thousands of feeds that you have to update on a 
-regular basis.  You can easily and efficiently accomplish this by calling the fetch.  If the results that you receive respond
-to the method new_entries, iterate over the new entries, processing them according to your business logic.
+regular basis.  If the results that you receive respond to the method new_entries, iterate over the new entries, processing them 
+according to your business logic.
 
 You will most likely want to allow Myzofeedtosis to remember details about the last retrieval of a feed after the client is 
 removed from memory.  Myzofeedtosis uses Moneta, a unified interface to key-value storage systems to remember "summaries" of
-feeds that it has seen in the fast.  See the document section on Customization for more details on how to configure this system.
+feeds that it has seen in the past.  See the document section on Customization for more details on how to configure this system.
 
 == Customization
 
@@ -81,11 +81,19 @@ requests, Myzofeedtosis stores the Last-Modified date, as well as the ETag of th
 put in a namespaced element consisting of the term 'Myzofeedtosis' (bet you won't have to worry about name collisions on that one!) 
 and the MD5 of the URL retrieved.  
 
-It can also be a bit tricky to decipher which feed entries are new, since many feed sources don't include unique ids with their
-feeds.  Myzofeedtosis reliably keeps track of which entries in a feed are new by storing (in the summary hash above) an MD5 signature
-of the feed.  It takes elements such as the published-at date, title and content and generates the MD5 of these elements.  This allows
-Myzofeedtosis to cheaply compute (both in terms of computation and storage) which feed entries should be presented to the user as
-"new".
+It can also be a bit tricky to decipher which feed entries are new since many feed sources don't include unique ids with their
+feeds.  Myzofeedtosis reliably keeps track of which entries in a feed are new by storing (in the summary hash mentioned above) an 
+MD5 signature of each entry in a feed.  It takes elements such as the published-at date, title and content and generates the MD5 
+of these elements.  This allows Myzofeedtosis to cheaply compute (both in terms of computation and storage) which feed entries 
+should be presented to the user as "new".  Below is an example of a summary structure:
+
+  { 
+    :etag=>"4c8f-46ac09fbbe940", :last_modified=>"Mon, 25 May 2009 18:17:33 GMT",
+    :digests=>["f2993783ded928637ce5f2dc2d837f10", "da64efa6dd9ce34e5699b9efe73a37a7"] 
+  }
+    
+The data stored by Myzofeedtosis in the summary structure allows it to be helpful to the user without storing lots of 
+data that are unnecessary for efficient functioning.
 
 == HTML cleaning/sanitizing
 
