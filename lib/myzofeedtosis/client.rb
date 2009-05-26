@@ -24,14 +24,10 @@ module Myzofeedtosis
                     @options[:backend].except(:moneta_klass) )
     end
     
-    # Retrieves the latest entries from this feed.  Returns a 
-    # Feednormalizer::Feed object with method +new_entries+ if the response was 
-    # successful, otherwise returns the Curl::Easy object that we used to 
-    # retrieve this resource.  Note that we also return this object if the 
-    # request resulted in a 304 (Not Modified) response code since we don't have 
-    # any new results.  Depending on your business logic, you may want to do 
-    # something in this case, such as putting this resource in a lower-priority 
-    # queue if it is not frequently updated.
+    # Retrieves the latest entries from this feed.  Returns a Myzofeedtosis::Result
+    # object which delegates methods to the Curl::Easy object making the request
+    # and the FeedNormalizer::Feed object that may have been created from the 
+    # HTTP response body.
     def fetch
       curl = build_curl_easy
       curl.perform
