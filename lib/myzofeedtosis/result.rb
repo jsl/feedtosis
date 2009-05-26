@@ -5,7 +5,7 @@ module Myzofeedtosis
   # method calls to the correct object.  If FeedNormalizer wasn't able to process
   # the response, calls which would be delegated to this object return nil.  In
   # these cases, depending on your business logic you may want to inspect the 
-  # state of the Curl::Easy object.
+  # state of the Curl::Easy object by using methods forwarded to it.
   class Result
     
     # Methods which should be delegated to the FeedNormalizer::Feed object.
@@ -14,21 +14,26 @@ module Myzofeedtosis
       :new_entries, :channel, :ttl, :skip_hours, :skip_days 
     ] unless defined?(FEED_METHODS)
     
+    # Precompiled regexp for detecting removing setter methods from collection 
+    # of methods to be delegated to the Curl::Easy object.
+    SETTER_METHOD_RE = /=$/o unless defined?(SETTER_METHOD_RE)
+    
     def initialize(curl, feed)
       @curl = curl
       @feed = feed
       
       raise ArgumentError, "Curl object must not be nil" if curl.nil?
-      
-      # See what the Curl::Easy object responds to, and send any appropriate
-      # messages its way.
-      @curl.public_methods(false).each do |meth|
-        (class << self; self; end).class_eval do
-          define_method meth do |*args|
-            @curl.send(meth, *args)
-          end
-        end
-      end
+    end
+    
+    # See what the Curl::Easy object responds to, and send any appropriate
+    # messages its way.  We don't worry about setter methods, since those
+    # aren't really useful to delegate.
+    Curl::Easy.instance_methods(false).reject do |m| 
+      m =~ SETTER_METHOD_RE
+    end.each do |meth|
+      define_method meth do |*args|
+        @curl.send(meth, *args)
+      end    
     end
     
     # Send methods through to the feed object unless it is nil.  If feed

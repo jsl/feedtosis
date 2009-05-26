@@ -23,6 +23,10 @@ describe Myzofeedtosis::Result do
     @r.body_str
   end
   
+  it "should not respond to setter methods common in the Curl::Easy class" do
+    @r.should_not respond_to(:encoding=)
+  end
+  
   it "should return nil for author if the Feed is nil" do
     r = Myzofeedtosis::Result.new(@c, nil)
     r.author

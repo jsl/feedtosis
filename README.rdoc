@@ -131,6 +131,11 @@ Myzofeedtosis doesn't do anything about feed sanitizing, as other libraries have
 been built for this purpose. FeedNormalizer has methods for escaping entries,
 but to strip HTML I suggest that you look at the Ruby gem "sanitize".
 
+== Credits
+
+Thanks to Sander Hartlage (GitHub: Sander6) for useful feedback early in the 
+development of Myzofeedtosis.
+
 == Feedback
 
 Please let me know if you have any problems with or questions about
