@@ -12,8 +12,6 @@ process where "one cell pierces another using a feeding tube, and sucks out
 cytoplasm". Myzofeedtosis is kind of like that, except it works with RSS/Atom
 feeds instead of cytoplasm.
 
-1 - http://en.wikipedia.org/wiki/List_of_vores
-
 == Philosophy
 
 Myzofeedtosis is designed to help you with book-keeping about feed fetching
@@ -37,22 +35,23 @@ Assuming that you've followed the directions on gems.github.com to allow your
 computer to install gems from GitHub, the following command will install the
 Myzofeedtosis library:
 
- sudo gem install jsl-myzofeedtosis
+  sudo gem install jsl-myzofeedtosis
 
 == Usage
 
 Myzofeedtosis is easy to use. Just create a client object, and invoke the
 "fetch" method:
 
- require 'myzofeedtosis' 
- client = Myzofeedtosis::Client.new('http://feeds.feedburner.com/wooster') 
- result = client.fetch
+  require 'myzofeedtosis' 
+  client = Myzofeedtosis::Client.new('http://feeds.feedburner.com/wooster') 
+  result = client.fetch
 
 +result+ will be a Myzofeedtosis::Result object which delegates methods to 
 the FeedNormalizer::Feed object as well as the Curl::Easy object used to fetch
 the feed.  Useful methods on this object include +entries+, +new_entries+ and
 +response_code+ among many others (basically all of the methods that 
-FeedNormalizer::Feed and Curl::Easy objects respond to should be implemented).
+FeedNormalizer::Feed and Curl::Easy objects respond to are implemented and can
+be called directly, minus the setter methods for these objects).
 
 Note that since Myzofeedtosis uses HTTP conditional GET, it may not actually 
 have received a full XML response from the server suitable for being parsed 
@@ -81,9 +80,9 @@ ruby Hash, so it won't keep track of feeds after a particular Client is removed
 from memory. To configure a different backend, pass an options hash to the
 Myzofeedtosis client initialization:
 
- url = "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml" 
- mf = Myzofeedtosis::Client.new(url, :backend => {:moneta_klass => 'Moneta::Memcache', :server => 'localhost:1978'}) 
- res = mf.fetch
+  url = "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml" 
+  mf = Myzofeedtosis::Client.new(url, :backend => {:moneta_klass => 'Moneta::Memcache', :server => 'localhost:1978'}) 
+  res = mf.fetch
 
 This example sets up a Memcache backend, which in this case points to Tokyo
 Tyrant on port 1978. Note that Moneta::Memcache can be given as a string, in
@@ -140,6 +139,10 @@ development of Myzofeedtosis.
 
 Please let me know if you have any problems with or questions about
 Myzofeedtosis.
+
+= References
+
+  (1) http://en.wikipedia.org/wiki/List_of_vores
 
 = Author
 

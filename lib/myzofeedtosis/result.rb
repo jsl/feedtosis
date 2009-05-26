@@ -30,18 +30,18 @@ module Myzofeedtosis
     # aren't really useful to delegate.
     Curl::Easy.instance_methods(false).reject do |m| 
       m =~ SETTER_METHOD_RE
-    end.each do |meth|
-      define_method meth do |*args|
-        @curl.send(meth, *args)
-      end    
+    end.each do |meth|                  # Example method:
+      define_method meth do |*args|     # def title
+        @curl.__send__(meth, *args)     #   @curl.title
+      end                               # end
     end
     
     # Send methods through to the feed object unless it is nil.  If feed
     # object is nil, return nil in response to method call.
-    FEED_METHODS.each do |meth|
-      define_method meth do |*args|
-        @feed.nil? ? nil : @feed.__send__(meth, *args)
-      end
+    FEED_METHODS.each do |meth|                         # Example method:
+      define_method meth do |*args|                     # def author
+        @feed.nil? ? nil : @feed.__send__(meth, *args)  #   @feed.nil? nil : @feed.author
+      end                                               # end
     end    
     
   end
