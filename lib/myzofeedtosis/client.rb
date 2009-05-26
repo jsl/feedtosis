@@ -1,9 +1,11 @@
 module Myzofeedtosis
   
-  # Myzofeedtosis::Client is the primary interface to the feed reader.  Call it with a url that was previously fetched while 
-  # connected to the configured backend, and it will 1) only do a retrieval if deemed necessary based on the etag and modified-at
-  # of the last etag and 2) mark all entries retrieved as either new or not new.  Entries retrieved are normalized using 
-  # the feed-normalizer gem.
+  # Myzofeedtosis::Client is the primary interface to the feed reader.  Call it 
+  # with a url that was previously fetched while connected to the configured 
+  # backend, and it will 1) only do a retrieval if deemed necessary based on the 
+  # etag and modified-at of the last etag and 2) mark all entries retrieved as 
+  # either new or not new.  Entries retrieved are normalized using the 
+  # feed-normalizer gem.
   class Client
     attr_reader :options, :url
 
@@ -22,22 +24,25 @@ module Myzofeedtosis
                     @options[:backend].except(:moneta_klass) )
     end
     
-    # Retrieves the latest entries from this feed.  Returns a Feednormalizer::Feed object with
-    # method +new_entries+ if the response was successful, otherwise returns the Curl::Easy object
-    # that we used to retrieve this resource.  Note that we also return this object if the request
-    # resulted in a 304 (Not Modified) response code since we don't have any new results.  Depending
-    # on your business logic, you may want to do something in this case, such as putting this 
-    # resource in a lower-priority queue if it is not frequently updated.
+    # Retrieves the latest entries from this feed.  Returns a 
+    # Feednormalizer::Feed object with method +new_entries+ if the response was 
+    # successful, otherwise returns the Curl::Easy object that we used to 
+    # retrieve this resource.  Note that we also return this object if the 
+    # request resulted in a 304 (Not Modified) response code since we don't have 
+    # any new results.  Depending on your business logic, you may want to do 
+    # something in this case, such as putting this resource in a lower-priority 
+    # queue if it is not frequently updated.
     def fetch
       curl = build_curl_easy
       curl.perform
-      process_curl_response(curl)
+      feed = process_curl_response(curl)
+      Myzofeedtosis::Result.new(curl, feed)
     end
     
     private
 
-    # Marks entries as either seen or not seen based on the unique signature of the entry, which
-    # is calculated by taking the MD5 of common attributes.
+    # Marks entries as either seen or not seen based on the unique signature of 
+    # the entry, which is calculated by taking the MD5 of common attributes.
     def mark_new_entries(response)
       digests = if summary_for_feed.nil? || summary_for_feed[:digests].nil?
         [ ]
@@ -45,8 +50,8 @@ module Myzofeedtosis
         summary_for_feed[:digests]
       end
             
-      # For each entry in the responses object, mark @_seen as false if the digest of this entry
-      # doesn't exist in the cached object.
+      # For each entry in the responses object, mark @_seen as false if the 
+      # digest of this entry doesn't exist in the cached object.
       response.entries.each do |e|
         seen = digests.include?(digest_for(e))
         e.instance_variable_set(:@_seen, seen)
@@ -63,17 +68,16 @@ module Myzofeedtosis
         response = mark_new_entries(response)
         store_summary_to_backend(response, curl)
         response
-      else
-        curl
       end
     end
     
-    # Sets options for the Curl::Easy object, including parameters for HTTP conditional GET.
+    # Sets options for the Curl::Easy object, including parameters for HTTP 
+    # conditional GET.
     def build_curl_easy
       curl = new_curl_easy(url)
 
-      # Many feeds have a 302 redirect to another URL.  For more recent versions of Curl, 
-      # we need to specify this.
+      # Many feeds have a 302 redirect to another URL.  For more recent versions 
+      # of Curl, we need to specify this.
       curl.follow_location = true
       
       set_header_options(curl)
@@ -93,8 +97,8 @@ module Myzofeedtosis
       summary = summary_for_feed
       
       unless summary.nil?
-        # We should only try to populate the headers for a conditional GET if we know both
-        # of these values.
+        # We should only try to populate the headers for a conditional GET if 
+        # we know both of these values.
         if summary[:etag] && summary[:last_modified]
           curl.headers['If-None-Match']     = summary[:etag]
           curl.headers['If-Modified-Since'] = summary[:last_modified]
@@ -108,9 +112,10 @@ module Myzofeedtosis
       MD5.hexdigest(@url)
     end
     
-    # Stores information about the retrieval, including ETag, Last-Modified, and MD5 digests of all 
-    # entries to the backend store.  This enables conditional GET usage on subsequent requests and 
-    # marking of entries as either new or seen.
+    # Stores information about the retrieval, including ETag, Last-Modified, 
+    # and MD5 digests of all entries to the backend store.  This enables 
+    # conditional GET usage on subsequent requests and marking of entries as 
+    # either new or seen.
     def store_summary_to_backend(feed, curl)
       headers = HttpHeaders.new(curl.header_str)
       
@@ -120,7 +125,8 @@ module Myzofeedtosis
       summary.merge!(:etag => headers.etag) unless headers.etag.nil?
       summary.merge!(:last_modified => headers.last_modified) unless headers.last_modified.nil?
       
-      # Store digest for each feed entry so we can detect new feeds on the next retrieval
+      # Store digest for each feed entry so we can detect new feeds on the next 
+      # retrieval
       digests = feed.entries.map do |e|
         digest_for(e)
       end
@@ -133,11 +139,12 @@ module Myzofeedtosis
       @backend[key_for_cached] = summary
     end
     
-    # Computes a unique signature for the FeedNormalizer::Entry object given.  This signature
-    # will be the MD5 of enough fields to have a reasonable probability of determining if the 
-    # entry is unique or not.
+    # Computes a unique signature for the FeedNormalizer::Entry object given.  
+    # This signature will be the MD5 of enough fields to have a reasonable 
+    # probability of determining if the entry is unique or not.
     def digest_for(entry)      
-      MD5.hexdigest([entry.date_published, entry.url, entry.title, entry.content].join)
+      MD5.hexdigest( [ entry.date_published, entry.url, entry.title, 
+        entry.content ].join)
     end
     
     def parser_for_xml(xml)

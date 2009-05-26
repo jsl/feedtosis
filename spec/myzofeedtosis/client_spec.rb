@@ -2,9 +2,9 @@ require File.join(File.dirname(__FILE__), %w[.. spec_helper])
 
 describe Myzofeedtosis::Client do
   before do
-    @url = "http://www.example.com/feed.rss"
+    @url  = "http://www.example.com/feed.rss"
     @opts = { :user_agent => "My Cool Application" }
-    @fr = Myzofeedtosis::Client.new(@url, @opts)
+    @fr   = Myzofeedtosis::Client.new(@url, @opts)
   end
 
   describe "initialization" do    
@@ -46,10 +46,18 @@ describe Myzofeedtosis::Client do
     end
     
     describe "when the response code is not 200" do
-      it "should return the Curl::Easy object" do
+      it "should return nil for feed methods such as #title and #author" do
         curl = mock('curl', :perform => true, :response_code => 304)
         @fr.expects(:build_curl_easy).returns(curl)
-        @fr.fetch.should == curl
+        res = @fr.fetch
+        res.title.should be_nil
+        res.author.should be_nil
+      end
+      
+      it "should return a Myzofeedtosis::Result object" do
+        curl = mock('curl', :perform => true, :response_code => 304)
+        @fr.expects(:build_curl_easy).returns(curl)
+        @fr.fetch.should be_a(Myzofeedtosis::Result)
       end
     end
 
@@ -59,7 +67,7 @@ describe Myzofeedtosis::Client do
           curl = mock('curl', :perform => true, :response_code => 200,
             :body_str => xml_fixture('wooster'), :header_str => http_header('wooster'))
           @fr.expects(:build_curl_easy).returns(curl)
-          @fr.fetch          
+          @fr.fetch
         end
         
         it "should have an empty array for new_entries" do

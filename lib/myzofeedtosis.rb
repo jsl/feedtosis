@@ -10,5 +10,7 @@ lib_dirs =  [ 'extensions', 'myzofeedtosis' ].map do |d|
 end
 
 lib_dirs.each do |d|
-  Dir[File.join(d, "**", "*.rb")].each {|file| require file }
+  Dir[File.join(d, "**", "*.rb")].each do |file| 
+    require file
+  end
 end
