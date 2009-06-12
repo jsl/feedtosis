@@ -140,7 +140,7 @@ module Myzofeedtosis
     # probability of determining if the entry is unique or not.
     def digest_for(entry)      
       MD5.hexdigest( [ entry.date_published, entry.url, entry.title, 
-        entry.content ].join)
+        entry.content ].join )
     end
     
     def parser_for_xml(xml)

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{myzofeedtosis}
-  s.version = "0.0.1.7"
+  s.version = "0.0.1.8"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Justin Leitgeb"]
@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
     '--inline-source'
    ]
 
-  %w[ taf2-curb wycats-moneta jsl-hashback jsl-http_headers feed-normalizer ].each do |dep|
+  %w[ taf2-curb aeden-moneta jsl-hashback jsl-http_headers feed_me ].each do |dep|
     s.add_dependency(dep)
   end
 
