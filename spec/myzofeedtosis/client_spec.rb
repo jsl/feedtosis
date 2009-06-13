@@ -35,6 +35,14 @@ describe Myzofeedtosis::Client do
       @fr.expects(:new_curl_easy).returns(curl_easy)
       @fr.fetch
     end
+    
+    describe "when given a pre-initialized backend" do
+      it "should set the @backend to the pre-initialized structure" do
+        h = HashBack::Backend.new('Foo', 'Moneta::Memory')
+        fc = Myzofeedtosis::Client.new(@url, :backend => h)
+        fc.__send__(:instance_variable_get, :@backend).should == h
+      end
+    end
   end
     
   describe "#fetch" do

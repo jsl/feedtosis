@@ -9,19 +9,26 @@ module Myzofeedtosis
   class Client
     attr_reader :options, :url
 
+    @@backends = {} unless defined?(@@backends)
+    
     DEFAULTS = {
       :backend => {
         :moneta_klass => 'Moneta::Memory'
       }
     } unless defined?(DEFAULTS)
 
+    # Initializes a new myzofeedtosis library.  The backend can be a hash of options, in 
+    # which case we initialize a new HashBack::Backend.  Or, it may be a pre-initialized
+    # backend, in which case we set the backend to the given HashBack::Backend object.
     def initialize(url, options = { })
       @url      = url
-      @options  = DEFAULTS.merge(options)
       
-      @backend  = HashBack::Backend.new( 'Myzofeedtosis', 
-                    @options[:backend][:moneta_klass], 
-                    @options[:backend].except(:moneta_klass) )
+      if options[:backend].is_a?(HashBack::Backend)
+        @backend = options[:backend]
+      else
+        @options = DEFAULTS.merge(options.dup)
+        @backend = HashBack::Backend.new( 'Myzofeedtosis', @options[:backend][:moneta_klass], @options[:backend].except(:moneta_klass) )        
+      end      
     end
     
     # Retrieves the latest entries from this feed.  Returns a Myzofeedtosis::Result
