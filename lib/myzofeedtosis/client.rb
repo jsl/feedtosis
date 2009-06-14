@@ -146,8 +146,7 @@ module Myzofeedtosis
     # This signature will be the MD5 of enough fields to have a reasonable 
     # probability of determining if the entry is unique or not.
     def digest_for(entry)      
-      MD5.hexdigest( [ entry.date_published, entry.url, entry.title, 
-        entry.content ].join )
+      MD5.hexdigest( [ entry.title, entry.content ].join )
     end
     
     def parser_for_xml(xml)
