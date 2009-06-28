@@ -7,20 +7,37 @@ module Feedtosis
   # either new or not new.  Entries retrieved are normalized using the 
   # feed-normalizer gem.
   class Client
-    attr_reader :options, :url
+    attr_reader :url, :options, :backend
     
-    # Some feed aggregators that we may be pulling from have entries that are present in one fetch and 
-    # then disappear (Google blog search does this).  For these cases, we can't rely on only the digests of 
-    # the last fetch to guarantee "newness" of a feed that we may have previously consumed.  We keep a 
-    # number of previous sets of digests in order to make sure that we mark correct feeds as "new".
-    RETAINED_DIGEST_SIZE = 10 unless defined?(RETAINED_DIGEST_SIZE)
+    DEFAULTS = {
+      :backend => Hash.new,
+      
+      # The namespace will be prefixed to the key used for storage of the summary value.  Based on your
+      # application needs, it may be useful to provide a custom prefix with initialization options.
+      :namespace => 'feedtosis',
+      
+      # Some feed aggregators that we may be pulling from have entries that are present in one fetch and 
+      # then disappear (Google blog search does this).  For these cases, we can't rely on only the digests of 
+      # the last fetch to guarantee "newness" of a feed that we may have previously consumed.  We keep a 
+      # number of previous sets of digests in order to make sure that we mark correct feeds as "new".
+      :retained_digest_size => 10
+    } unless defined?(DEFAULTS)
 
-    # Initializes a new feedtosis library.  The backend can be a hash of options, in 
-    # which case we initialize a new HashBack::Backend.  Or, it may be a pre-initialized
-    # backend, in which case we set the backend to the given HashBack::Backend object.
-    def initialize(url, backend = Moneta::Memory.new)
-      @url      = url
-      @backend  = backend
+    # Initializes a new feedtosis library.  It must be initialized with a valid URL as the first argument.
+    # A following Hash, if given, may have the following keys:
+    #   * backend: a key-value store to be used for summary structures of feeds fetched.  Moneta backends work well, but any object acting like a Hash is valid.
+    #   * retained_digest_size: an Integer specifying the number of previous MD5 sets of entries to keep, used for new feed detection    
+    def initialize(*args)
+      @url      = args.first
+      
+      @options  = args.extract_options!
+      @options  = @options.reverse_merge(DEFAULTS)
+
+      @backend  = @options[:backend]
+      
+      unless @url.match(URI.regexp('http'))
+        raise ArgumentError, "Url #{@url} is not valid!"
+      end
       
       unless @backend.respond_to?(:[]) && @backend.respond_to?(:[]=)
         raise ArgumentError, "Backend needs to be a key-value store"
@@ -107,8 +124,9 @@ module Feedtosis
       curl
     end
 
+    # Returns the key for the storage of the summary structure in the key-value system.
     def key_for_cached
-      MD5.hexdigest(@url)
+      [ @options[:namespace], MD5.hexdigest(@url) ].join('_')
     end
     
     # Stores information about the retrieval, including ETag, Last-Modified, 
@@ -131,7 +149,7 @@ module Feedtosis
       end
       
       new_digest_set = summary_for_feed[:digests].unshift(new_digest_set)
-      new_digest_set = new_digest_set[0..RETAINED_DIGEST_SIZE]
+      new_digest_set = new_digest_set[0..@options[:retained_digest_size]]
       
       summary.merge!( :digests => new_digest_set )
       set_summary(summary)

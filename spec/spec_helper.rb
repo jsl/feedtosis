@@ -2,6 +2,9 @@ require 'rubygems'
 require 'mocha'
 require 'spec'
 
+require 'moneta'
+require 'moneta/memory'
+
 require File.join(File.dirname(__FILE__), %w[.. lib feedtosis])
 
 Spec::Runner.configure do |config|

@@ -3,13 +3,27 @@ require File.join(File.dirname(__FILE__), %w[.. spec_helper])
 describe Feedtosis::Client do
   before do
     @url      = "http://www.example.com/feed.rss"
-    @backend  = Moneta::Memory.new
-    @fr       = Feedtosis::Client.new(@url, @backend)
+    @backend  = Hash.new
+    @fr       = Feedtosis::Client.new(@url, :backend => @backend)
   end
 
   describe "initialization" do    
     it "should set #url to an Array when an Array is given" do
       @fr.url.should == @url
+    end
+    
+    describe "validation of url in first argument" do
+      it "should not raise an error on initialization with a valid HTTP url" do
+        lambda {
+          Feedtosis::Client.new('http://www.example.com')
+        }.should_not raise_error
+      end
+      
+      it "should raise an error on initialization with an invalid url" do
+        lambda {
+          Feedtosis::Client.new('ftp://www.example.com')
+        }.should raise_error(ArgumentError)
+      end
     end
     
     it "should set the If-None-Match and If-Modified-Since headers to the value of the summary hash" do
@@ -42,7 +56,7 @@ describe Feedtosis::Client do
     describe "when given a pre-initialized backend" do
       it "should set the @backend to the pre-initialized structure" do
         h   = Moneta::Memory.new
-        fc  = Feedtosis::Client.new(@url, h)
+        fc  = Feedtosis::Client.new(@url, :backend => h)
         fc.__send__(:instance_variable_get, :@backend).should == h
       end
       
@@ -50,9 +64,21 @@ describe Feedtosis::Client do
         o = Object.new
         
         lambda {
-          Feedtosis::Client.new(@url, o)          
+          Feedtosis::Client.new(@url, :backend => o)          
         }.should raise_error(ArgumentError)
       end
+    end
+  end
+    
+  describe "#key_for_cached" do
+    it "should default to the MD5 of the url after the namespace" do
+      c = Feedtosis::Client.new(@url)
+      c.__send__(:key_for_cached).should == [ 'feedtosis', MD5.hexdigest(@url) ].join('_')
+    end
+    
+    it "should respect a custom namespace if given" do
+      c = Feedtosis::Client.new(@url, :namespace => 'justin')
+      c.__send__(:key_for_cached).should == [ 'justin', MD5.hexdigest(@url) ].join('_')
     end
   end
     

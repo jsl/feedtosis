@@ -1,10 +1,10 @@
 require 'rubygems'
+
 require 'curb'
-require 'moneta'
-require 'moneta/memory'
 require 'http_headers'
 require 'feed-normalizer'
 require 'md5'
+require 'uri'
 
 lib_dirs =  [ 'extensions', 'feedtosis' ].map do |d|
   File.join(File.dirname(__FILE__), d)

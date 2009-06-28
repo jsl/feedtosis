@@ -9,17 +9,16 @@ well as by pointing out which entries are new in any given feed.
 Feedtosis is designed to help you with book-keeping about feed fetching
 details. This is usually something that is mundane and not fundamentally related
 to the business logic of applications that deal with the consumption of
-syndicated content on the web. Feedtosis keeps track of these mundane
-details so you can just keep grabbing new content without wasting bandwidth in
-making unnecessary requests and programmer time in implementing algorithms to
-figure out which feed entries are new.
+syndicated content on the web. Feedtosis keeps track of these details so you can 
+just keep grabbing new content without wasting bandwidth in making unnecessary requests 
+and programmer time in implementing algorithms to figure out which feed entries are new.
 
 Feedtosis fits into other frameworks to do the heavy lifting, including the
 Curb library which does HTTP requests through curl, and FeedNormalizer which
 abstracts the differences between syndication formats. In the sense that it fits
 into these existing, robust programs, Feedtosis is a modular middleware
 piece that efficiently glues together disparate parts to create a helpful feed
-reader with a minimal (< 200 LOC), test-covered codebase.
+reader with a minimal, spec-covered codebase.
 
 == Installation
 
@@ -73,13 +72,11 @@ from memory. To configure a different backend, pass an options hash to the
 Feedtosis client initialization:
 
   url = "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml" 
-  mf = Feedtosis::Client.new(url, :backend => {:moneta_klass => 'Moneta::Memcache', :server => 'localhost:1978'}) 
-  res = mf.fetch
+  f = Feedtosis::Client.new(url, :backend => Moneta::Memcache.new(:server => 'localhost:1978')) 
+  res = f.fetch
 
 This example sets up a Memcache backend, which in this case points to Tokyo
-Tyrant on port 1978. Note that Moneta::Memcache can be given as a string, in
-which case you don't have to manually require Moneta::Memcache before
-initializing the client.
+Tyrant on port 1978.
 
 Generally, Feedtosis supports all systems supported by Moneta, and any one
 of the supported systems can be given to the +moneta_klass+ parameter. Other
@@ -109,12 +106,18 @@ computation and storage) which feed entries should be presented to the user as
   { 
     :etag => "4c8f-46ac09fbbe940", 
     :last_modified => "Mon, 25 May 2009 18:17:33 GMT",
-    :digests => ["f2993783ded928637ce5f2dc2d837f10", "da64efa6dd9ce34e5699b9efe73a37a7"] 
+    :digests => [["f2993783ded928637ce5f2dc2d837f10", "da64efa6dd9ce34e5699b9efe73a37a7"]]
   }
 
 The data stored by Feedtosis in the summary structure allows it to be
 helpful to the user without storing lots of data that are unnecessary for
 efficient functioning.
+
+The summary structure keeps an Array of Arrays containing digests of feeds.  The reason
+for this is that some feeds, such as the Google blog search feeds, contain slightly different
+but often-recurring results in the result set.  Feedtosis keeps complete sets of entry digests
+for previous feed retrievals.  The number of digest sets that will be kept is configurable by
+setting the option :retained_digest_size on Feedtosis client initialization.
 
 == HTML cleaning/sanitizing
 
@@ -131,10 +134,6 @@ development of Feedtosis.
 
 Please let me know if you have any problems with or questions about
 Feedtosis.
-
-= References
-
-  (1) http://en.wikipedia.org/wiki/List_of_vores
 
 = Author
 
