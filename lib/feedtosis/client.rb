@@ -1,6 +1,6 @@
-module Myzofeedtosis
+module Feedtosis
   
-  # Myzofeedtosis::Client is the primary interface to the feed reader.  Call it 
+  # Feedtosis::Client is the primary interface to the feed reader.  Call it 
   # with a url that was previously fetched while connected to the configured 
   # backend, and it will 1) only do a retrieval if deemed necessary based on the 
   # etag and modified-at of the last etag and 2) mark all entries retrieved as 
@@ -9,29 +9,17 @@ module Myzofeedtosis
   class Client
     attr_reader :options, :url
 
-    @@backends = {} unless defined?(@@backends)
-    
-    DEFAULTS = {
-      :backend => {
-        :moneta_klass => 'Moneta::Memory'
-      }
-    } unless defined?(DEFAULTS)
-
-    # Initializes a new myzofeedtosis library.  The backend can be a hash of options, in 
+    # Initializes a new feedtosis library.  The backend can be a hash of options, in 
     # which case we initialize a new HashBack::Backend.  Or, it may be a pre-initialized
     # backend, in which case we set the backend to the given HashBack::Backend object.
-    def initialize(url, options = { })
+    def initialize(url, backend = Moneta::Memory.new)
       @url      = url
+      @backend  = backend
       
-      if options[:backend].is_a?(HashBack::Backend)
-        @backend = options[:backend]
-      else
-        @options = DEFAULTS.merge(options.dup)
-        @backend = HashBack::Backend.new( 'Myzofeedtosis', @options[:backend][:moneta_klass], @options[:backend].except(:moneta_klass) )        
-      end      
+      
     end
     
-    # Retrieves the latest entries from this feed.  Returns a Myzofeedtosis::Result
+    # Retrieves the latest entries from this feed.  Returns a Feedtosis::Result
     # object which delegates methods to the Curl::Easy object making the request
     # and the FeedNormalizer::Feed object that may have been created from the 
     # HTTP response body.
@@ -39,7 +27,7 @@ module Myzofeedtosis
       curl = build_curl_easy
       curl.perform
       feed = process_curl_response(curl)
-      Myzofeedtosis::Result.new(curl, feed)
+      Feedtosis::Result.new(curl, feed)
     end
     
     private

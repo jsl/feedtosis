@@ -1,31 +1,23 @@
 = Description
 
-Myzofeedtosis is a library that helps you to efficiently process syndicated web
+Feedtosis is a library that helps you to efficiently process syndicated web
 resources. It helps by automatically using conditional HTTP GET requests, as
 well as by pointing out which entries are new in any given feed.
 
-== Name
-
-The name "myzofeedtosis" is based on the form of cellular digestion
-"myzocytosis". According to Wikipedia [1], myzocytosis is described as the
-process where "one cell pierces another using a feeding tube, and sucks out
-cytoplasm". Myzofeedtosis is kind of like that, except it works with RSS/Atom
-feeds instead of cytoplasm.
-
 == Philosophy
 
-Myzofeedtosis is designed to help you with book-keeping about feed fetching
+Feedtosis is designed to help you with book-keeping about feed fetching
 details. This is usually something that is mundane and not fundamentally related
 to the business logic of applications that deal with the consumption of
-syndicated content on the web. Myzofeedtosis keeps track of these mundane
+syndicated content on the web. Feedtosis keeps track of these mundane
 details so you can just keep grabbing new content without wasting bandwidth in
 making unnecessary requests and programmer time in implementing algorithms to
 figure out which feed entries are new.
 
-Myzofeedtosis fits into other frameworks to do the heavy lifting, including the
+Feedtosis fits into other frameworks to do the heavy lifting, including the
 Curb library which does HTTP requests through curl, and FeedNormalizer which
 abstracts the differences between syndication formats. In the sense that it fits
-into these existing, robust programs, Myzofeedtosis is a modular middleware
+into these existing, robust programs, Feedtosis is a modular middleware
 piece that efficiently glues together disparate parts to create a helpful feed
 reader with a minimal (< 200 LOC), test-covered codebase.
 
@@ -33,55 +25,55 @@ reader with a minimal (< 200 LOC), test-covered codebase.
 
 Assuming that you've followed the directions on gems.github.com to allow your
 computer to install gems from GitHub, the following command will install the
-Myzofeedtosis library:
+Feedtosis library:
 
-  sudo gem install jsl-myzofeedtosis
+  sudo gem install jsl-feedtosis
 
 == Usage
 
-Myzofeedtosis is easy to use. Just create a client object, and invoke the
+Feedtosis is easy to use. Just create a client object, and invoke the
 "fetch" method:
 
-  require 'myzofeedtosis' 
-  client = Myzofeedtosis::Client.new('http://feeds.feedburner.com/wooster') 
+  require 'feedtosis' 
+  client = Feedtosis::Client.new('http://feeds.feedburner.com/wooster') 
   result = client.fetch
 
-+result+ will be a Myzofeedtosis::Result object which delegates methods to 
++result+ will be a Feedtosis::Result object which delegates methods to 
 the FeedNormalizer::Feed object as well as the Curl::Easy object used to fetch
 the feed.  Useful methods on this object include +entries+, +new_entries+ and
 +response_code+ among many others (basically all of the methods that 
 FeedNormalizer::Feed and Curl::Easy objects respond to are implemented and can
 be called directly, minus the setter methods for these objects).
 
-Note that since Myzofeedtosis uses HTTP conditional GET, it may not actually 
+Note that since Feedtosis uses HTTP conditional GET, it may not actually 
 have received a full XML response from the server suitable for being parsed 
-into entries.  In this case, methods such as +entries+ on the Myzofeedtosis::Result
+into entries.  In this case, methods such as +entries+ on the Feedtosis::Result
 will return +nil+.  Depending on your application logic, you may want to inspect
 the methods that are delegated to the Curl::Easy object, such as +response_code+,
 for more information on what happened in these cases.
 
-On subsequent requests of a particular resource, Myzofeedtosis will update 
+On subsequent requests of a particular resource, Feedtosis will update 
 +new_entries+ to contain the feed entries that we haven't seen yet.  In most
 applications, your program will probably call the same batch of URLS multiple 
 times, and process the elements in +new_entries+.
 
-You will most likely want to allow Myzofeedtosis to remember details about the
-last retrieval of a feed after the client is removed from memory. Myzofeedtosis
+You will most likely want to allow Feedtosis to remember details about the
+last retrieval of a feed after the client is removed from memory. Feedtosis
 uses Moneta, a unified interface to key-value storage systems to remember
 "summaries" of feeds that it has seen in the past. See the document section on
 Customization for more details on how to configure this system.
 
 == Customization
 
-Myzofeedtosis stores summaries of feeds in a key-value storage system. If no
-options are included when creating a new Myzofeedtosis::Client object, the
+Feedtosis stores summaries of feeds in a key-value storage system. If no
+options are included when creating a new Feedtosis::Client object, the
 default is to use a "memory" storage system. The memory system is just a basic
 ruby Hash, so it won't keep track of feeds after a particular Client is removed
 from memory. To configure a different backend, pass an options hash to the
-Myzofeedtosis client initialization:
+Feedtosis client initialization:
 
   url = "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml" 
-  mf = Myzofeedtosis::Client.new(url, :backend => {:moneta_klass => 'Moneta::Memcache', :server => 'localhost:1978'}) 
+  mf = Feedtosis::Client.new(url, :backend => {:moneta_klass => 'Moneta::Memcache', :server => 'localhost:1978'}) 
   res = mf.fetch
 
 This example sets up a Memcache backend, which in this case points to Tokyo
@@ -89,28 +81,28 @@ Tyrant on port 1978. Note that Moneta::Memcache can be given as a string, in
 which case you don't have to manually require Moneta::Memcache before
 initializing the client.
 
-Generally, Myzofeedtosis supports all systems supported by Moneta, and any one
+Generally, Feedtosis supports all systems supported by Moneta, and any one
 of the supported systems can be given to the +moneta_klass+ parameter. Other
 options following +backend+ are passed directly to Moneta for configuration.
 
 == Implementation
 
-Myzofeedtosis helps to identify new feed entries and to figure out when
+Feedtosis helps to identify new feed entries and to figure out when
 conditional GET can be used in retrieving resources. In order to accomplish this
 without having to require that the user store information such as etags and
-dates of the last retrieved entry, Myzofeedtosis stores a summary structure in
+dates of the last retrieved entry, Feedtosis stores a summary structure in
 the configured key-value store (backed by Moneta). In order to do conditional
-GET requests, Myzofeedtosis stores the Last-Modified date, as well as the ETag
+GET requests, Feedtosis stores the Last-Modified date, as well as the ETag
 of the last request in the summary structure, which is put in a namespaced
-element consisting of the term 'Myzofeedtosis' (bet you won't have to worry
+element consisting of the term 'Feedtosis' (bet you won't have to worry
 about name collisions on that one!) and the MD5 of the URL retrieved.
 
 It can also be a bit tricky to decipher which feed entries are new since many
-feed sources don't include unique ids with their feeds. Myzofeedtosis reliably
+feed sources don't include unique ids with their feeds. Feedtosis reliably
 keeps track of which entries in a feed are new by storing (in the summary hash
 mentioned above) an MD5 signature of each entry in a feed. It takes elements
 such as the published-at date, title and content and generates the MD5 of these
-elements. This allows Myzofeedtosis to cheaply compute (both in terms of
+elements. This allows Feedtosis to cheaply compute (both in terms of
 computation and storage) which feed entries should be presented to the user as
 "new". Below is an example of a summary structure:
 
@@ -120,25 +112,25 @@ computation and storage) which feed entries should be presented to the user as
     :digests => ["f2993783ded928637ce5f2dc2d837f10", "da64efa6dd9ce34e5699b9efe73a37a7"] 
   }
 
-The data stored by Myzofeedtosis in the summary structure allows it to be
+The data stored by Feedtosis in the summary structure allows it to be
 helpful to the user without storing lots of data that are unnecessary for
 efficient functioning.
 
 == HTML cleaning/sanitizing
 
-Myzofeedtosis doesn't do anything about feed sanitizing, as other libraries have
+Feedtosis doesn't do anything about feed sanitizing, as other libraries have
 been built for this purpose. FeedNormalizer has methods for escaping entries,
 but to strip HTML I suggest that you look at the Ruby gem "sanitize".
 
 == Credits
 
 Thanks to Sander Hartlage (GitHub: Sander6) for useful feedback early in the 
-development of Myzofeedtosis.
+development of Feedtosis.
 
 == Feedback
 
 Please let me know if you have any problems with or questions about
-Myzofeedtosis.
+Feedtosis.
 
 = References
 

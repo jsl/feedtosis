@@ -1,19 +1,15 @@
 require File.join(File.dirname(__FILE__), %w[.. spec_helper])
 
-describe Myzofeedtosis::Client do
+describe Feedtosis::Client do
   before do
-    @url  = "http://www.example.com/feed.rss"
-    @opts = { :user_agent => "My Cool Application" }
-    @fr   = Myzofeedtosis::Client.new(@url, @opts)
+    @url      = "http://www.example.com/feed.rss"
+    @backend  = Moneta::Memory.new
+    @fr       = Feedtosis::Client.new(@url, @backend)
   end
 
   describe "initialization" do    
     it "should set #url to an Array when an Array is given" do
       @fr.url.should == @url
-    end
-    
-    it "should set #options to the options hash given at end of list" do
-      @fr.options.should == Myzofeedtosis::Client::DEFAULTS.merge(@opts)
     end
     
     it "should set the If-None-Match and If-Modified-Since headers to the value of the summary hash" do
@@ -38,9 +34,14 @@ describe Myzofeedtosis::Client do
     
     describe "when given a pre-initialized backend" do
       it "should set the @backend to the pre-initialized structure" do
-        h = HashBack::Backend.new('Foo', 'Moneta::Memory')
-        fc = Myzofeedtosis::Client.new(@url, :backend => h)
+        h   = Moneta::Memory.new
+        fc  = Feedtosis::Client.new(@url, h)
         fc.__send__(:instance_variable_get, :@backend).should == h
+      end
+      
+      it "should raise an error if the backend is not a key-value store based on behavior" do
+        o = Object.new
+        Feedtosis::Client.new(@url, :backend => o)
       end
     end
   end
@@ -62,10 +63,10 @@ describe Myzofeedtosis::Client do
         res.author.should be_nil
       end
       
-      it "should return a Myzofeedtosis::Result object" do
+      it "should return a Feedtosis::Result object" do
         curl = mock('curl', :perform => true, :response_code => 304)
         @fr.expects(:build_curl_easy).returns(curl)
-        @fr.fetch.should be_a(Myzofeedtosis::Result)
+        @fr.fetch.should be_a(Feedtosis::Result)
       end
     end
 

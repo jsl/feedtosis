@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), %w[.. .. spec_helper])
 
-describe Myzofeedtosis::FeedInstanceMethods do
+describe Feedtosis::FeedInstanceMethods do
   before do
     @fn = FeedNormalizer::FeedNormalizer.parse(xml_fixture('wooster'))
   end

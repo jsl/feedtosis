@@ -1,6 +1,6 @@
 # Extends FeedNormalizer::Feed with method for detecting new_items (aliased as new_entries for 
 # convenience).
-module Myzofeedtosis
+module Feedtosis
   module FeedInstanceMethods
     
     # Returns only the feeds that are new.
@@ -14,4 +14,4 @@ module Myzofeedtosis
   end
 end
 
-FeedNormalizer::Feed.__send__(:include, Myzofeedtosis::FeedInstanceMethods)
+FeedNormalizer::Feed.__send__(:include, Feedtosis::FeedInstanceMethods)

@@ -1,15 +1,15 @@
 require File.join(File.dirname(__FILE__), %w[.. spec_helper])
 
-describe Myzofeedtosis::Result do
+describe Feedtosis::Result do
   before do
     @c = mock('curl')
     @f = mock('feed')
-    @r = Myzofeedtosis::Result.new(@c, @f)
+    @r = Feedtosis::Result.new(@c, @f)
   end
   
   it "should raise an ArgumentError if the Curl object is nil" do
     lambda {
-      Myzofeedtosis::Result.new(nil, nil)
+      Feedtosis::Result.new(nil, nil)
     }.should raise_error(ArgumentError)
   end
   
@@ -28,7 +28,7 @@ describe Myzofeedtosis::Result do
   end
   
   it "should return nil for author if the Feed is nil" do
-    r = Myzofeedtosis::Result.new(@c, nil)
+    r = Feedtosis::Result.new(@c, nil)
     r.author
   end
 end

@@ -5,7 +5,7 @@ require 'rake'
 require 'spec/rake/spectask'
 require 'rake/rdoctask'
 
-require 'lib/myzofeedtosis'
+require 'lib/feedtosis'
 
 desc 'Test the plugin.'
 Spec::Rake::SpecTask.new(:spec) do |t|
@@ -20,9 +20,9 @@ task :default => :spec
 desc 'Generate documentation'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Myzofeedtosis'
+  rdoc.title    = 'Feedtosis'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README.rdoc')
-  rdoc.rdoc_files.include('lib/myzofeedtosis/**/*.rb')
+  rdoc.rdoc_files.include('lib/feedtosis/**/*.rb')
 end
 

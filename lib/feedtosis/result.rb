@@ -1,4 +1,4 @@
-module Myzofeedtosis
+module Feedtosis
   
   # Makes the response components both from the Curl::Easy object and the 
   # FeedNormalizer::Feed object available to the user by delegating appropriate
