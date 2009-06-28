@@ -16,7 +16,9 @@ module Feedtosis
       @url      = url
       @backend  = backend
       
-      
+      unless @backend.respond_to?(:[]) && @backend.respond_to?(:[]=)
+        raise ArgumentError, "Backend needs to be a key-value store"
+      end
     end
     
     # Retrieves the latest entries from this feed.  Returns a Feedtosis::Result

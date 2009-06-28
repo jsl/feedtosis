@@ -41,7 +41,10 @@ describe Feedtosis::Client do
       
       it "should raise an error if the backend is not a key-value store based on behavior" do
         o = Object.new
-        Feedtosis::Client.new(@url, :backend => o)
+        
+        lambda {
+          Feedtosis::Client.new(@url, o)          
+        }.should raise_error(ArgumentError)
       end
     end
   end
