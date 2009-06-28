@@ -90,12 +90,8 @@ module Feedtosis
       summary = summary_for_feed
       
       unless summary.nil?
-        # We should only try to populate the headers for a conditional GET if 
-        # we know both of these values.
-        if summary[:etag] && summary[:last_modified]
-          curl.headers['If-None-Match']     = summary[:etag]
-          curl.headers['If-Modified-Since'] = summary[:last_modified]
-        end
+        curl.headers['If-None-Match']     = summary[:etag] unless summary[:etag].nil?
+        curl.headers['If-Modified-Since'] = summary[:last_modified] unless summary[:last_modified].nil?
       end
       
       curl
