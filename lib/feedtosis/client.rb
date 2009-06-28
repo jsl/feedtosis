@@ -55,11 +55,12 @@ module Feedtosis
       response
     end
 
-    # Returns an Array of summary digests for this feed.
+    # Returns an Array of summary digests for this feed.  Since we keep a number of sets
+    # of digests, inject across these sets to accumulate unique identifiers.
     def summary_digests
       summary_for_feed[:digests].inject([]) do |r, e|
         r |= e
-      end
+      end.uniq
     end
 
     # Processes the results by identifying which entries are new if the response
