@@ -17,7 +17,7 @@ describe Feedtosis::Client do
       curl_headers.expects(:[]=).with('If-None-Match', '42ab')
       curl_headers.expects(:[]=).with('If-Modified-Since', 'Mon, 25 May 2009 16:38:49 GMT')
       
-      summary = { :etag => '42ab', :last_modified => 'Mon, 25 May 2009 16:38:49 GMT' }
+      summary = { :etag => '42ab', :last_modified => 'Mon, 25 May 2009 16:38:49 GMT', :digests => [ ] }
       
       @fr.__send__(:set_summary, summary)
       
@@ -30,6 +30,13 @@ describe Feedtosis::Client do
       
       @fr.expects(:new_curl_easy).returns(curl_easy)
       @fr.fetch
+    end
+    
+    describe "#summary_for_feed" do
+      it "should return a hash with :digests set to an empty Array when summary is nil" do
+        @fr.__send__(:set_summary, nil)
+        @fr.__send__(:summary_for_feed).should == {:digests => [ ]}
+      end
     end
     
     describe "when given a pre-initialized backend" do
@@ -86,7 +93,7 @@ describe Feedtosis::Client do
           curl = mock('curl', :perform => true, :response_code => 200,
             :body_str => xml_fixture('wooster'), :header_str => http_header('wooster'))
           @fr.expects(:build_curl_easy).returns(curl)
-          @fr.fetch.new_entries.should == []          
+          @fr.fetch.new_entries.should == []
         end
       end
       

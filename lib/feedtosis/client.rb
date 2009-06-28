@@ -8,6 +8,12 @@ module Feedtosis
   # feed-normalizer gem.
   class Client
     attr_reader :options, :url
+    
+    # Some feed aggregators that we may be pulling from have entries that are present in one fetch and 
+    # then disappear (Google blog search does this).  For these cases, we can't rely on only the digests of 
+    # the last fetch to guarantee "newness" of a feed that we may have previously consumed.  We keep a 
+    # number of previous sets of digests in order to make sure that we mark correct feeds as "new".
+    RETAINED_DIGEST_SIZE = 10 unless defined?(RETAINED_DIGEST_SIZE)
 
     # Initializes a new feedtosis library.  The backend can be a hash of options, in 
     # which case we initialize a new HashBack::Backend.  Or, it may be a pre-initialized
@@ -37,12 +43,8 @@ module Feedtosis
     # Marks entries as either seen or not seen based on the unique signature of 
     # the entry, which is calculated by taking the MD5 of common attributes.
     def mark_new_entries(response)
-      digests = if summary_for_feed.nil? || summary_for_feed[:digests].nil?
-        [ ]
-      else
-        summary_for_feed[:digests]
-      end
-            
+      digests = summary_digests
+
       # For each entry in the responses object, mark @_seen as false if the 
       # digest of this entry doesn't exist in the cached object.
       response.entries.each do |e|
@@ -51,6 +53,13 @@ module Feedtosis
       end
       
       response
+    end
+
+    # Returns an Array of summary digests for this feed.
+    def summary_digests
+      summary_for_feed[:digests].inject([]) do |r, e|
+        r |= e
+      end
     end
 
     # Processes the results by identifying which entries are new if the response
@@ -82,7 +91,7 @@ module Feedtosis
 
     # Returns the summary hash for this feed from the backend store.
     def summary_for_feed
-      @backend[key_for_cached]
+      @backend[key_for_cached] || { :digests => [ ] }
     end
 
     # Sets the headers from the backend, if available
@@ -116,11 +125,14 @@ module Feedtosis
       
       # Store digest for each feed entry so we can detect new feeds on the next 
       # retrieval
-      digests = feed.entries.map do |e|
+      new_digest_set = feed.entries.map do |e|
         digest_for(e)
       end
       
-      summary.merge!(:digests => digests)
+      new_digest_set = summary_for_feed[:digests].unshift(new_digest_set)
+      new_digest_set = new_digest_set[0..RETAINED_DIGEST_SIZE]
+      
+      summary.merge!( :digests => new_digest_set )
       set_summary(summary)
     end
     
@@ -132,7 +144,7 @@ module Feedtosis
     # This signature will be the MD5 of enough fields to have a reasonable 
     # probability of determining if the entry is unique or not.
     def digest_for(entry)      
-      MD5.hexdigest( [ entry.title, entry.content ].join )
+      MD5.hexdigest( [ entry.title, entry.content, entry.date_published ].join )
     end
     
     def parser_for_xml(xml)
