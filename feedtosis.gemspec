@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
     "spec/extensions/feed_normalizer/feed_instance_methods_spec.rb", 
     "spec/fixtures/http_headers/wooster.txt", 
     "spec/fixtures/xml/older_wooster.xml", "spec/fixtures/xml/wooster.xml", 
-    "spec/feedtosis/client_spec.rb", "spec/feedtosis_spec.rb", 
+    "spec/feedtosis/client_spec.rb",
     "spec/feedtosis/result_spec.rb",
     "spec/spec_helper.rb"]
   
@@ -26,8 +26,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.1}
   s.summary = %q{Retrieves feeds using conditional GET and marks entries that you haven't seen before}
-  s.test_files = ["spec/feedtosis_spec.rb", "spec/spec_helper.rb", "spec/feedtosis/client_spec.rb",
-    "spec/feedtosis/result_spec.rb" ]
+  s.test_files = ["spec/spec_helper.rb", "spec/feedtosis/client_spec.rb", "spec/feedtosis/result_spec.rb" ]
 
   s.extra_rdoc_files = [ "README.rdoc" ]
   
