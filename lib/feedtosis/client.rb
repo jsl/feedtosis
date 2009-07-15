@@ -24,14 +24,14 @@ module Feedtosis
     } unless defined?(DEFAULTS)
 
     # Initializes a new feedtosis library.  It must be initialized with a valid URL as the first argument.
-    # A following Hash, if given, may have the following keys:
+    # A following optional +options+ Hash may take the arguments: 
     #   * backend: a key-value store to be used for summary structures of feeds fetched.  Moneta backends work well, but any object acting like a Hash is valid.
     #   * retained_digest_size: an Integer specifying the number of previous MD5 sets of entries to keep, used for new feed detection    
-    def initialize(*args)
-      @url      = args.first
+    def initialize(url, options = { })
+      @url      = url
       
-      @options  = args.extract_options!
-      @options  = @options.reverse_merge(DEFAULTS)
+      raise ArgumentError, "Feedtosis::Client options must be in Hash form if provided" unless options.is_a?(Hash)
+      @options  = options.reverse_merge(DEFAULTS)
 
       @backend  = @options[:backend]
       
@@ -94,7 +94,7 @@ module Feedtosis
     # Sets options for the Curl::Easy object, including parameters for HTTP 
     # conditional GET.
     def build_curl_easy
-      curl = new_curl_easy(url)
+      curl = new_curl_easy(@url)
 
       # Many feeds have a 302 redirect to another URL.  For more recent versions 
       # of Curl, we need to specify this.

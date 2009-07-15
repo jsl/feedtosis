@@ -1,0 +1,6 @@
+require 'moneta'
+require 'moneta/memcache'
+
+url = "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml" 
+f = Feedtosis::Client.new(url, :backend => Moneta::Memcache.new(:server => 'localhost:1978')) 
+res = f.fetch

@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name = %q{feedtosis}
-  s.version = "0.0.3.2"
+  s.version = "0.0.3.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Justin Leitgeb"]
-  s.date = %q{2009-05-22}
+  s.date = %q{2009-07-15}
   s.description = %q{Feedtosis finds new information in feeds quickly using smart fetching and matching of previously read entries}
   s.email = %q{justin@phq.org}
   

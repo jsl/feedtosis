@@ -26,6 +26,12 @@ describe Feedtosis::Client do
       end
     end
     
+    it "should raise ArgumentError if options is not a Hash" do
+      lambda {
+        Feedtosis::Client.new('http://www.example.com', Object.new)
+      }.should raise_error(ArgumentError)
+    end
+    
     it "should set the If-None-Match and If-Modified-Since headers to the value of the summary hash" do
       curl_headers = mock('headers')
       curl_headers.expects(:[]=).with('If-None-Match', '42ab')
@@ -90,6 +96,18 @@ describe Feedtosis::Client do
       @fr.fetch
     end
     
+    describe "when called more than once" do
+      it "should call new_curl_easy with #{@url}" do
+        mock_curl = mock('curl')
+        mock_curl.expects(:follow_location=).with(true).twice
+        mock_curl.expects(:perform).twice
+        mock_curl.expects(:response_code).twice
+        @fr.expects(:new_curl_easy).with(@url).twice.returns(mock_curl)
+        @fr.fetch
+        @fr.fetch
+      end
+    end
+    
     describe "when the response code is not 200" do
       it "should return nil for feed methods such as #title and #author" do
         curl = mock('curl', :perform => true, :response_code => 304)
@@ -140,4 +158,5 @@ describe Feedtosis::Client do
       end
     end
   end  
+  
 end
