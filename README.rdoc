@@ -82,6 +82,18 @@ Generally, Feedtosis supports all systems supported by Moneta, and any one
 of the supported systems can be given to the +moneta_klass+ parameter. Other
 options following +backend+ are passed directly to Moneta for configuration.
 
+== Feedtosis Fetch Results
+
+The results of the Feedtosis Fetch will be a Feedtosis::Result object.  You can call
+"entries" and "new_entries" on this object.  It also delegates methods to the curb object
+so that you can inspect the HTTP response if necessary.  
+
+Note that if you find entries and new_entries to be nil it isn't necessarily indicative of an 
+error condition - it may just be that the resource wasn't downloaded since it wasn't modified 
+from the previous fetch! To determine if this was the case, call the method "response_code" 
+on the Results object.  If the code is 304 (Not Modified), it means that it used HTTP conditional 
+GET to determine that the resource wasn't worth downloading as it contained no new information.
+
 == Implementation
 
 Feedtosis helps to identify new feed entries and to figure out when
