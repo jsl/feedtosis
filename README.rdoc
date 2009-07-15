@@ -2,7 +2,7 @@
 
 Feedtosis is a library that helps you to efficiently process syndicated web
 resources. It helps by automatically using conditional HTTP GET requests, as
-well as by pointing out which entries are new in any given feed.
+well as by reliably pointing out which entries are new in any given feed.
 
 == Philosophy
 
