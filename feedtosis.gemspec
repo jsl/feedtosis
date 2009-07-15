@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{feedtosis}
-  s.version = "0.0.3.3"
+  s.version = "0.0.3.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Justin Leitgeb"]
@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = %q{Feedtosis finds new information in feeds quickly using smart fetching and matching of previously read entries}
   s.email = %q{justin@phq.org}
   
-  s.files = ["lib/extensions/core/array.rb", "lib/extensions/core/hash.rb", 
+  s.files = ["lib/extensions/core/hash.rb", 
     "lib/extensions/feed_normalizer/feed_instance_methods.rb", 
     "lib/feedtosis/result.rb",
     "lib/feedtosis/client.rb", "lib/feedtosis.rb", "LICENSE", 
