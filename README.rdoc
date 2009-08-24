@@ -1,24 +1,14 @@
 = Description
 
-Feedtosis is a library that helps you to efficiently process syndicated web
-resources. It helps by automatically using conditional HTTP GET requests, as
-well as by reliably pointing out which entries are new in any given feed.
-
-== Philosophy
+Feedtosis fetches RSS and Atom feeds with an easy-to-use interface.  It uses
+FeedNormalizer for parsing, and Curb for fetching.  It helps by automatically 
+using conditional HTTP GET requests as well as by reliably pointing out which 
+entries are new in any given feed.
 
 Feedtosis is designed to help you with book-keeping about feed fetching
-details. This is usually something that is mundane and not fundamentally related
-to the business logic of applications that deal with the consumption of
-syndicated content on the web. Feedtosis keeps track of these details so you can 
-just keep grabbing new content without wasting bandwidth in making unnecessary requests 
-and programmer time in implementing algorithms to figure out which feed entries are new.
-
-Feedtosis fits into other frameworks to do the heavy lifting, including the
-Curb library which does HTTP requests through curl, and FeedNormalizer which
-abstracts the differences between syndication formats. In the sense that it fits
-into these existing, robust programs, Feedtosis is a modular middleware
-piece that efficiently glues together disparate parts to create a helpful feed
-reader with a minimal, spec-covered codebase.
+details so that things like using HTTP conditional GET are trivial. It has a simple
+interface, and remains a lightweight component that delegates to FeedNormalizer
+for parsing feeds and the fantastic taf2-curb library for fetching feeds.
 
 == Installation
 
