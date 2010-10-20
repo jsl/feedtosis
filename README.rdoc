@@ -16,7 +16,7 @@ Assuming that you've followed the directions on gems.github.com to allow your
 computer to install gems from GitHub, the following command will install the
 Feedtosis library:
 
-  sudo gem install jsl-feedtosis
+  sudo gem install feedtosis
 
 == Usage
 
