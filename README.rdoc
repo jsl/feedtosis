@@ -132,4 +132,6 @@ Feedtosis.
 
 = Author
 
-Justin S. Leitgeb, mailto:justin@phq.org
+Justin S. Leitgeb, mailto:justin@stackbuilders.com
+
+Copyright (c) 2010 {Stack Builders Inc.}[http://stackbuilders.com]
